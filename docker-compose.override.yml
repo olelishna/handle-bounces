@@ -1,11 +1,18 @@
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
+  web_bounces:
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    volumes:
+      - .:/var/www/html
+    env_file:
+      - .env.local
     ports:
-      - "5432"
-###< doctrine/doctrine-bundle ###
+      - "8010:80"
+    stdin_open: true
+    tty: true
 
 ###> symfony/mailer ###
   mailer:
