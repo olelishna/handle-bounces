@@ -4,14 +4,25 @@ framework:
 
         transports:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
+
+            sqs_bounced_mails:
+                dsn: '%env(MESSENGER_TRANSPORT_SQS_DSN)%'
+                options:
+                    auto_setup: false
+                    access_key: '%env(AWS_KEY)%'
+                    secret_key: '%env(AWS_SECRET)%'
+                serializer: App\Messenger\SqsSuppressedMailSerializer
+
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 options:
+                    auto_setup: false
                     use_notify: true
                     check_delayed_interval: 60000
                 retry_strategy:
                     max_retries: 3
                     multiplier: 2
+
             failed: 'doctrine://default?queue_name=failed'
             # sync: 'sync://'
 
