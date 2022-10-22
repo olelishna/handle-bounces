@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Suppressed Clients{% endblock %}
+
+{% block body %}
+
+    <style>
+        .bne_pagination {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+
+    <div class="container mb-5">
+        <h1 class="mt-5 mb-3">Suppressed Clients</h1>
+
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th class="text-center">User</th>
+                <th class="text-center">Score</th>
+                <th class="text-center">Total Bounced</th>
+                <th class="text-center">Total Complaint</th>
+                <th class="text-center">Created</th>
+                <th class="text-center">Updated</th>
+                <th scope="col" class="text-center">Operations</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for client in clients %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.score|number_format(2, '.', ',') }}</td>
+                    <td>{{ client.bounced.count }}</td>
+                    <td>{{ client.complaint.count }}</td>
+                    <td>
+                        {{ client.created|date("Y-m-d") }}<br>
+                        <small><i>{{ client.created|date("H:i:s") }}</i></small>
+                    </td>
+                    <td>
+                        {{ client.updated|date("Y-m-d") }}<br>
+                        <small><i>{{ client.updated|date("H:i:s") }}</i></small>
+                    </td>
+                    <td>
+                        {{ include('suppressed/_delete_form.html.twig') }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8">No records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {{ include('block/pagination.html.twig') }}
+    </div>
+{% endblock %}

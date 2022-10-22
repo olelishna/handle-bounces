@@ -15,6 +15,7 @@ services:
       $infusionsoft_clientSecret: "%env(INFUSIONSOFT_CLIENT_SECRET)%"
       $infusionsoft_redirectUri: "%env(INFUSIONSOFT_REDIRECT_URI)%"
       $update_score_time_limit: '2 days ago'
+      $pager_default_limit: 50
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name

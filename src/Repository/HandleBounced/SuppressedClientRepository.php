@@ -5,6 +5,8 @@ namespace App\Repository\HandleBounced;
 use App\Entity\HandleBounced\SuppressedClient;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -51,5 +53,30 @@ class SuppressedClientRepository extends ServiceEntityRepository
             ->orderBy('s.score', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return SuppressedClient[] Returns an array of SuppressedClient objects
+     */
+    public function findAllView($offset, $limit): array
+    {
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.score', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findAllViewCount(): int
+    {
+        try {
+            return $this->createQueryBuilder('s')
+                ->select('COUNT(s.email) as suppressedClientsCount')
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch (NoResultException|NonUniqueResultException $e) {
+            return 0;
+        }
     }
 }

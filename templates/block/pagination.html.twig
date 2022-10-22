@@ -1,0 +1,56 @@
+<nav class="bne_pagination" aria-label="Page navigation example">
+    <ul class="pagination">
+
+        {% if pager.prev < 0 %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">First page</a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pager.route_name, pager.firstq) }}" aria-label="First page">First
+                    page</a>
+            </li>
+        {% endif %}
+
+        {% if pager.prev < 0 %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span aria-hidden="true">&laquo;</span></a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pager.route_name, pager.prevq) }}" aria-label="Previous"><span
+                            aria-hidden="true">&laquo;</span></a>
+            </li>
+        {% endif %}
+
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                <span aria-hidden="true">{{ pager.page }}</span>
+            </a>
+        </li>
+
+        {% if (pager.page * pager.limit >= pager.counted_data) %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span aria-hidden="true">&raquo;</span></a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pager.route_name, pager.nextq) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% if (pager.page * pager.limit >= pager.counted_data) %}
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Last page</a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(pager.route_name, pager.lastq) }}" aria-label="Last page">Last
+                    page</a>
+            </li>
+        {% endif %}
+
+    </ul>
+</nav>
