@@ -96,6 +96,8 @@ class SqsSuppressedMailSerializer implements SerializerInterface
 
     private function createRecipient(string $user_email): SuppressedClient
     {
+        $user_email = mb_strtolower($user_email);
+
         $user = $this->clientRepository->find($user_email);
 
         if ($user === null) {

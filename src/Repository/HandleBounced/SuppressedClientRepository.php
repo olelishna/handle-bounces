@@ -3,6 +3,7 @@
 namespace App\Repository\HandleBounced;
 
 use App\Entity\HandleBounced\SuppressedClient;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -37,5 +38,18 @@ class SuppressedClientRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @return SuppressedClient[] Returns an array of SuppressedClient objects
+     */
+    public function findAllNotUpdatedFrom(DateTime $updated): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.updated <= :date')
+            ->setParameter('date', $updated)
+            ->orderBy('s.score', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

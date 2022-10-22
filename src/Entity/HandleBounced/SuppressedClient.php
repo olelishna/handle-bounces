@@ -43,7 +43,7 @@ class SuppressedClient
         $this->complaint = new ArrayCollection();
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }

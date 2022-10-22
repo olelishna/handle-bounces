@@ -5,25 +5,22 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Entity\HandleBounced\BouncedItem;
-use App\Entity\HandleBounced\SuppressedClient;
-use App\Entity\HandleBounced\SuppressedMail;
 use App\Message\LogBouncedMail;
 use App\Repository\HandleBounced\BouncedItemRepository;
 use App\Repository\HandleBounced\SuppressedClientRepository;
 use App\Repository\HandleBounced\SuppressedMailRepository;
+use App\Service\HandleBounced\Appraiser;
 use DateTime;
 use Exception;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class SqsBouncedMailHandler implements MessageHandlerInterface
 {
-    private SuppressedClient $client;
-    private SuppressedMail $mail;
-
     public function __construct(
         private readonly SuppressedClientRepository $clientRepository,
         private readonly SuppressedMailRepository $mailRepository,
         private readonly BouncedItemRepository $bouncedItemRepository,
+        private readonly Appraiser $appraiser
     ) {
     }
 
@@ -32,17 +29,19 @@ class SqsBouncedMailHandler implements MessageHandlerInterface
      */
     public function __invoke(LogBouncedMail $data)
     {
-        $this->mail = $data->getMail();
-        $this->client = $data->getClient();
-
-        /** TODO: Add calc for score! */
-        $this->client->setScore(0);
-        $this->client->setUpdatedValue();
-
+        $mail = $data->getMail();
+        $client = $data->getClient();
         $bounced = $this->setBounced($data->getBouncedData());
 
-        $this->mailRepository->save($this->mail);
-        $this->clientRepository->save($this->client);
+        $score = $this->appraiser->assess($client);
+        $client->setScore($score);
+
+        $bounced
+            ->setMail($mail)
+            ->setRecipient($client);
+
+        $this->mailRepository->save($mail);
+        $this->clientRepository->save($client);
         $this->bouncedItemRepository->save($bounced, true);
     }
 
@@ -58,9 +57,7 @@ class SqsBouncedMailHandler implements MessageHandlerInterface
             ->setStatus($data['bouncedRecipients'][0]['status'] ?? null)
             ->setDiagnosticCode($data['bouncedRecipients'][0]['diagnosticCode'] ?? null)
             ->setTimestamp(new DateTime($data['timestamp']))
-            ->setReportingMTA($data['reportingMTA'] ?? null)
-            ->setMail($this->mail)
-            ->setRecipient($this->client);
+            ->setReportingMTA($data['reportingMTA'] ?? null);
 
         return $bounce;
     }
